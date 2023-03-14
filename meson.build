@@ -1,27 +1,22 @@
-srcs_xorg_ramdac = [
-    'xf86RamDac.c',
-    'xf86RamDacCmap.c',
-    'xf86CursorRD.c',
-    'xf86HWCurs.c',
-    'IBM.c',
-    'BT.c',
-    'TI.c',
-]
+project('libxramdac', 'c',
+        version: '0.1.0',
+        meson_version: '>= 0.40.0',
+        default_options: ['warning_level=1',
+                          'buildtype=debugoptimized'])
 
-xorg_ramdac = static_library('xorg_ramdac',
-    srcs_xorg_ramdac,
-    include_directories: [inc, xorg_inc],
-    dependencies: common_dep,
-    c_args: xorg_c_args,
-)
+libcvt_version = meson.project_version().split('.')
 
-install_data(
-    [
-        'BT.h',
-        'IBM.h',
-        'TI.h',
-        'xf86Cursor.h',
-        'xf86RamDac.h',
-    ],
-    install_dir: xorgsdkdir,
-)
+cc = meson.get_compiler('c')
+mdep = cc.find_library('m', required : false)
+
+prefix  = get_option('prefix')
+inc = include_directories('include/libxramdac')
+
+subdir('include')
+subdir('lib')
+
+pkg_mod = import('pkgconfig')
+pkg_mod.generate(libraries : libxramdac,
+                 version : '1.0',
+                 name : 'libxramdac',
+                 description : 'A Library to interface with external RAMDACs.')
